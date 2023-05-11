@@ -1,82 +1,99 @@
-import { cloneElement, isValidElement, useEffect, useState, Children, ReactElement, useMemo } from 'react';
-import styled from 'styled-components';
+import React, { useEffect, useRef, useState } from 'react';
+import styled, { css } from 'styled-components';
 
-import AccordionItem from './AccordionItem';
-import { IAccordionItemProps, IAccordionProps } from './type';
+import { Icon } from 'components/Icon';
+import { IAccordionProps } from './type';
+import AccordionWrapper from './AccordionWrapper';
 
-const Accordion = ({ defaultOpenId = '1', children, className, onClick }: IAccordionProps) => {
-  const [isMounted, setIsMounted] = useState(false);
-  const [accordions, setAccordions] = useState<Record<string, boolean>>({});
+const Accordion = ({
+  id,
+  header,
+  children,
+  className,
+  headerClassName = 'accordion-item-header',
+  bodyClassName = 'accordion-item-body',
+  iconClassName = 'accordion-item-icon',
+  icon = 'chevron-down',
+  open = true,
+  isGroup,
+  onClick
+}: IAccordionProps) => {
+  const [isOpen, setIsOpen] = useState(open);
 
-  // Convert children into array of child
-  const arrayChildren = Children.toArray(children);
+  const contentHeight = useRef('auto');
+  const AccordionBodyRef = useRef<HTMLDivElement>(null);
 
-  const onAccordionClick = (isOpen: boolean, id: string) => {
-    const newAccordions = Object.keys(accordions).reduce<Record<string, boolean>>((acc, key) => {
-      return {
-        ...acc,
-        [key]: key !== id ? false : !isOpen
-      };
-    }, {});
+  const { scrollHeight = 0 } = AccordionBodyRef.current || {};
+  contentHeight.current = scrollHeight ? `${scrollHeight}px` : 'auto';
 
-    setAccordions(newAccordions);
+  const onAccordionClick = () => {
+    !isGroup && setIsOpen((prev) => !prev);
     onClick && onClick(isOpen, id);
   };
 
   useEffect(() => {
-    if (!isMounted) {
-      arrayChildren.forEach((child) => {
-        // Typescript is dumb here, even if you filter at the start ts will still throw error.
-        if (isValidElement(child)) {
-          const {
-            props: { id }
-          } = child;
-
-          if (id) {
-            // Setup accordion default values
-            setAccordions((prev) => ({
-              ...prev,
-              [id]: id === defaultOpenId
-            }));
-          }
-        }
-      });
-
-      // We only want to setup default value before mount
-      setIsMounted(true);
+    // If it should function as group, then register open prop to state
+    if (isGroup) {
+      setIsOpen(open);
     }
-  }, [isMounted]);
+  }, [open]);
 
   return (
     <AccordionContainer className={className}>
-      {Children.map(arrayChildren, (child) => {
-        if (isValidElement(child)) {
-          const {
-            props: { id }
-          } = child;
-
-          if (!id) {
-            return null;
-          }
-
-          return cloneElement(child as ReactElement<IAccordionItemProps>, {
-            onClick: onAccordionClick,
-            open: !isMounted ? id === defaultOpenId : accordions[id],
-            isGroup: true
-          });
-        }
-
-        return null;
-      })}
+      <AccordionHeader className={headerClassName} onClick={onAccordionClick}>
+        {header} <AccordionCaretIcon className={iconClassName} $isActive={isOpen} icon={icon} size={14} />
+      </AccordionHeader>
+      <AccordionBody ref={AccordionBodyRef} className={bodyClassName} $height={isOpen ? contentHeight.current : ''}>
+        {children}
+      </AccordionBody>
     </AccordionContainer>
   );
 };
 
-Accordion.AccordionItem = AccordionItem;
+Accordion.AccordionWrapper = AccordionWrapper;
 
 export default Accordion;
 
 const AccordionContainer = styled.div`
+  display: inline-block;
+  overflow: hidden;
+  border-radius: 4px;
+`;
+
+const AccordionHeader = styled.header`
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+
+  cursor: pointer;
+  background: blue;
+  color: white;
+  padding: 5px 8px;
+`;
+
+const AccordionCaretIcon = styled(Icon)<{ $isActive: boolean }>`
+  margin-left: 5px;
+  transition: all 0.3s ease-in-out;
+  transform: ${({ $isActive }) => $isActive && 'rotate(-180deg)'};
+`;
+
+const AccordionBody = styled.div<{ $height: string }>`
+  border: 1px solid #dddddd;
+  border-radius: 0 0 4px 4px;
+
+  overflow: hidden;
+  transition: max-height 0.2s ease-in-out;
+  padding: 0 8px;
+
+  ${({ $height }) =>
+    $height
+      ? css`
+          max-height: ${$height};
+          border: 1px solid #dddddd;
+        `
+      : css`
+          max-height: 0;
+          border-color: transparent;
+          border-bottom: none;
+        `}
 `;

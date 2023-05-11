@@ -5,3 +5,4 @@ export * from './Input';
 export * from './Styled';
 export * from './TabSelector';
 export * from './Scrollable';
+export * from './BadAccordion';

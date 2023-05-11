@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-export interface IAccordionItemProps {
+export interface IAccordionProps {
   id: string;
   header?: string;
   children?: ReactNode;
@@ -14,7 +14,7 @@ export interface IAccordionItemProps {
   isGroup?: boolean;
 }
 
-export interface IAccordionProps {
+export interface IAccordionWrapperProps {
   children?: ReactNode;
   className?: string;
   defaultOpenId?: string;
