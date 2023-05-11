@@ -12,7 +12,6 @@ const Accordion = ({ defaultOpenId = '1', children, className, onClick }: IAccor
   const arrayChildren = Children.toArray(children);
 
   const onAccordionClick = (isOpen: boolean, id: string) => {
-    // Convert object to array, then convert it back to object
     const newAccordions = Object.keys(accordions).reduce<Record<string, boolean>>((acc, key) => {
       return {
         ...acc,
@@ -56,12 +55,18 @@ const Accordion = ({ defaultOpenId = '1', children, className, onClick }: IAccor
             props: { id }
           } = child;
 
+          if (!id) {
+            return null;
+          }
+
           return cloneElement(child as ReactElement<IAccordionItemProps>, {
             onClick: onAccordionClick,
             open: !isMounted ? id === defaultOpenId : accordions[id],
             isGroup: true
           });
         }
+
+        return null;
       })}
     </AccordionContainer>
   );

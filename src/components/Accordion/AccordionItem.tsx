@@ -1,63 +1,59 @@
-import React, { useRef, useState, FC, useEffect } from 'react';
+import React, { memo, useEffect, useRef, useState, FC } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Icon } from 'components/Icon';
 import { IAccordionItemProps } from './type';
 
-const AccordionItem: FC<IAccordionItemProps> = ({
-  id,
-  header,
-  children,
-  className,
-  headerClassName = 'accordion-item-header',
-  bodyClassName = 'accordion-item-body',
-  iconClassName = 'accordion-item-icon',
-  icon = 'chevron-down',
-  open = true,
-  isGroup,
-  onClick
-}) => {
-  const [isOpen, setIsOpen] = useState(open);
+const AccordionItem: FC<IAccordionItemProps> = memo(
+  ({
+    id,
+    header,
+    children,
+    className,
+    headerClassName = 'accordion-item-header',
+    bodyClassName = 'accordion-item-body',
+    iconClassName = 'accordion-item-icon',
+    icon = 'chevron-down',
+    open = true,
+    isGroup,
+    onClick
+  }) => {
+    const [isOpen, setIsOpen] = useState(open);
 
-  const contentHeight = useRef(0);
-  const accordionItemBodyRef = useRef<HTMLDivElement>(null);
+    const contentHeight = useRef('auto');
+    const accordionItemBodyRef = useRef<HTMLDivElement>(null);
 
-  // Find the default height of content so that we can animate
-  const contentExpandHeight = contentHeight.current ? `${contentHeight.current}px` : 'auto';
-
-  const onAccordionClick = () => {
-    !isGroup && setIsOpen((prev) => !prev);
-    onClick && onClick(isOpen, id);
-  };
-
-  useEffect(() => {
-    // ScrollHeight -> ENTIRE content & padding (visible or not)
     const { scrollHeight = 0 } = accordionItemBodyRef.current || {};
-    contentHeight.current = scrollHeight;
-  }, []);
+    contentHeight.current = scrollHeight ? `${scrollHeight}px` : 'auto';
 
-  useEffect(() => {
-    // If it should function as group, then register open prop to state
-    if (isGroup) {
-      setIsOpen(open);
-    }
-  }, [open]);
+    const onAccordionClick = () => {
+      !isGroup && setIsOpen((prev) => !prev);
+      onClick && onClick(isOpen, id);
+    };
 
-  return (
-    <AccordionItemContainer className={className}>
-      <AccordionItemHeader className={headerClassName} onClick={onAccordionClick}>
-        {header} <AccordionCaretIcon className={iconClassName} $isActive={isOpen} icon={icon} size={14} />
-      </AccordionItemHeader>
-      <AccordionItemBody
-        ref={accordionItemBodyRef}
-        className={bodyClassName}
-        $height={isOpen ? contentExpandHeight : ''}
-      >
-        {children}
-      </AccordionItemBody>
-    </AccordionItemContainer>
-  );
-};
+    useEffect(() => {
+      // If it should function as group, then register open prop to state
+      if (isGroup) {
+        setIsOpen(open);
+      }
+    }, [open]);
+
+    return (
+      <AccordionItemContainer className={className}>
+        <AccordionItemHeader className={headerClassName} onClick={onAccordionClick}>
+          {header} <AccordionCaretIcon className={iconClassName} $isActive={isOpen} icon={icon} size={14} />
+        </AccordionItemHeader>
+        <AccordionItemBody
+          ref={accordionItemBodyRef}
+          className={bodyClassName}
+          $height={isOpen ? contentHeight.current : ''}
+        >
+          {children}
+        </AccordionItemBody>
+      </AccordionItemContainer>
+    );
+  }
+);
 
 export default AccordionItem;
 
