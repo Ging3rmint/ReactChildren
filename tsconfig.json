@@ -3,11 +3,10 @@
     "target": "es5",
     "baseUrl": "./src",
     "paths": {
-      "@variables": ["./constants/variables"],
-      "@styled": ["./constants/styled"],
-      "@organisms": ["./components/organisms"],
-      "@molecules": ["./components/molecules"],
-      "@atoms": ["./components/atoms"]
+      "@/variables": ["./constants/variables"],
+      "@/styled": ["./constants/styled"],
+      "@/components": ["./components"],
+      "@/constants": ["./constants"]
     },
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,

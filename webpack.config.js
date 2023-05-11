@@ -1,33 +1,33 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const PORT = 3030;
-const PROXY = "http://localhost:8000";
+const PROXY = 'http://localhost:8000';
 
 module.exports = {
-  entry: "./src/index.tsx",
+  entry: './src/index.tsx',
   output: {
-    path: path.join(__dirname, "build"),
-    filename: "main.js",
-    publicPath: "/",
+    path: path.join(__dirname, 'build'),
+    filename: 'main.js',
+    publicPath: '/'
   },
-  devtool: "eval-source-map",
+  devtool: 'eval-source-map',
   devServer: {
     compress: true,
     hot: true,
     port: PORT,
     historyApiFallback: true,
     proxy: {
-      "/api": {
+      '/api': {
         target: `http://localhost:${PORT}`,
-        router: () => PROXY,
-      },
-    },
+        router: () => PROXY
+      }
+    }
   },
   resolve: {
-    extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],
-    plugins: [new TsconfigPathsPlugin()],
+    extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+    plugins: [new TsconfigPathsPlugin()]
   },
   module: {
     rules: [
@@ -35,27 +35,38 @@ module.exports = {
         test: /\.m?js$/,
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader",
+          loader: 'babel-loader',
           options: {
-            presets: ["@babel/preset-react", "@babel/preset-env"],
-            plugins: ["@babel/plugin-transform-runtime"],
-          },
-        },
+            presets: ['@babel/preset-react', '@babel/preset-env'],
+            plugins: ['@babel/plugin-transform-runtime']
+          }
+        }
       },
       {
         test: /\.(css|scss)$/,
-        use: ["style-loader", "css-loader", "sass-loader"],
+        use: ['style-loader', 'css-loader', 'sass-loader']
       },
       {
         test: /\.(ts|tsx)$/,
-        loader: "ts-loader",
-        exclude: /node_modules/,
+        loader: 'ts-loader',
+        exclude: /node_modules/
       },
-    ],
+      {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: 'svg-url-loader',
+            options: {
+              limit: 10000
+            }
+          }
+        ]
+      }
+    ]
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "./public/index.html",
-    }),
-  ],
+      template: './public/index.html'
+    })
+  ]
 };
