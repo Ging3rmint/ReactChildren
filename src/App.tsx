@@ -185,7 +185,7 @@ const AppAccordion = styled(Accordion)`
   }
 `;
 
-const AppAccordionWrapper2 = styled(AccordionWrapper)`
+const AppAccordion2 = styled(Accordion)`
   margin-left: 10px;
 
   .accordion-item-icon {
@@ -209,7 +209,7 @@ const AppAccordionWrapper = styled(AccordionWrapper)`
   width: 300px;
 `;
 
-const AppAccordion2 = styled(Accordion)`
+const AppAccordionWrapper2 = styled(AccordionWrapper)`
   flex-direction: row;
 
   > * {

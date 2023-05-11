@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Icon } from 'components/Icon';
-import { IAccordionProps } from './type';
 import AccordionWrapper from './AccordionWrapper';
+import { IAccordionProps } from './type';
 
 const Accordion = ({
   id,
@@ -18,6 +18,7 @@ const Accordion = ({
   isGroup,
   onClick
 }: IAccordionProps) => {
+  const [isMounted, setIsMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(open);
 
   const contentHeight = useRef('auto');
@@ -37,6 +38,10 @@ const Accordion = ({
       setIsOpen(open);
     }
   }, [open]);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, [isMounted]);
 
   return (
     <AccordionContainer className={className}>
